@@ -35,7 +35,7 @@ class carRecipe(ConanFile):
 
     def requirements(self):
         self.requires("fmt/8.1.1")
-        self.requires("engine/1.0")
+        self.requires("engine/2.0")
         self.requires("control_unit/1.0")
 
     def generate(self):
