@@ -1,0 +1,9 @@
+{
+    "version": 4,
+    "vendor": {
+        "conan": {}
+    },
+    "include": [
+        "/Users/micso/projects/examples2/tutorial/creating_packages/car_project/car/test_package/build/apple-clang-15-x86_64-gnu17-release/generators/CMakePresets.json"
+    ]
+}
