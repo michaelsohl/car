@@ -1,6 +1,9 @@
 from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
+from conan.tools.scm import Git
+from conan.errors import ConanInvalidConfiguration
 
+countries = ["sweden", "finland", "denmark"]
 
 class carRecipe(ConanFile):
     name = "car"
@@ -16,15 +19,11 @@ class carRecipe(ConanFile):
 
     # Binary configuration
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False], "fPIC": [True, False]}
-    default_options = {"shared": False, "fPIC": True}
+    options = {"shared": [True, False], "country": ["sweden", "denmark", "finland"]}
+    default_options = {"shared": False, "country": "sweden"}
 
     # Sources are located in the same place as this recipe, copy them to the recipe
-    exports_sources = "CMakeLists.txt", "src/*", "include/*" 
-
-    def config_options(self):
-        if self.settings.os == "Windows":
-            self.options.rm_safe("fPIC")
+    exports_sources = "CMakeLists.txt", "src/*", "include/*"
 
     def configure(self):
         if self.options.shared:
@@ -35,13 +34,27 @@ class carRecipe(ConanFile):
 
     def requirements(self):
         self.requires("fmt/8.1.1")
-        self.requires("engine/2.0")
         self.requires("control_unit/1.0")
+
+        # Depending on option -o country=
+        if self.options.country:
+          if self.options.country == "sweden":
+            self.requires("engine/2.0")    
+          elif self.options.country == "finland":
+            self.requires("engine_fin/2.0")
+          elif self.options.country == "denmark":
+            self.requires("engine_den/2.0")
+
+    def build_requirements(self):
+        self.tool_requires("cmake/3.22.6")
 
     def generate(self):
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
+        if self.options.country:
+          tc.variables["COUNTRY"] = self.options.country
+       
         tc.generate()
 
     def build(self):
